@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "boom": "^4.0.0",
     "hapi": "^15.0.3",
     "sequelize": "^3.24.1",
     "sqlite3": "^3.1.4"
