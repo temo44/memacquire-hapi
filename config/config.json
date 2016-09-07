@@ -3,9 +3,9 @@
     "username": "root",
     "password": null,
     "database": "database_development",
-    "host": "/home/timo/data-test.db",
+    "host": "data-test.db",
     "dialect": "sqlite",
-    "storage": "/home/timo/data-test.db"
+    "storage": "data-test.db"
   },
   "test": {
     "username": "root",
