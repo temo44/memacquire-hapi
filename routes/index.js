@@ -8,7 +8,6 @@ module.exports = function (hapiServer) {
       if (file === 'index.js') return;
 
       console.log(`going to import route file ${file}`);
-      var route = require(path.join(__dirname, file));
-      hapiServer.route(route);
+      require(path.join(__dirname, file))(hapiServer);
     });
 }
