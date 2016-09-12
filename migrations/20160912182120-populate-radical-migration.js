@@ -30,9 +30,12 @@ module.exports = {
       lines = _.drop(lines, 4);
 
       var radicals = _.map(lines, function (rowString) {
-        var val = _.split(rowString, ';');
+        var val = _.map(_.split(rowString, ';'), function(value) {
+          if(!value) return undefined;
+          return value;
+        });
+        
 
-        // return `(\'${val[key]}\', \'${val[character]}\', \'${val[meaning]}\', \'${val[image]}\', ${val[level]})`;
         return {
           key: val[key],
           character: val[character],
