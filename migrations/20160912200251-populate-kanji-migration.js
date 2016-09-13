@@ -5,7 +5,7 @@ const models = require('../models');
 'use strict';
 
 module.exports = {
-    up: function (queryInterface, Sequelize) {
+    up: function (queryInterface, Sequelize, done) {
         /*
          Add altering commands here.
          Return a promise to correctly handle asynchronicity.
