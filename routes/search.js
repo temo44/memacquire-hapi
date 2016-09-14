@@ -15,15 +15,25 @@ module.exports = function (hapiServer) {
         const error = Boom.badRequest('No keyword sent');
         return reply(error);
       }
-    
-      var result = {};
-      
+
+      //split the word up in smaller pieces
+      var wordFilter = keyword.split('');
+
       //get kanji radicals first
       models.KanjiRadical.findAll({
         where: {
-          kanji: keyword
-        }
-      }).then(kanjiRadicals => reply({ radicals: kanjiRadicals })); 
+          kanji: {
+            $like: { $any: wordFilter }
+          }
+        },
+        order: [
+          ['kanji', 'ASC']
+        ]
+      }).then(kanjiRadicals => {
+        console.log(kanjiRadicals);
+        reply({ radicals: kanjiRadicals })
+      });
     }
   });
-};
+}
+;
