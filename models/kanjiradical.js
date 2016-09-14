@@ -3,6 +3,7 @@ module.exports = function(sequelize, DataTypes) {
   var KanjiRadical = sequelize.define('KanjiRadical', {
     kanji: DataTypes.STRING,
     radical: DataTypes.STRING,
+    radicalImage: DataTypes.STRING,
     radicalMeaning: DataTypes.STRING
   }, {
     classMethods: {
