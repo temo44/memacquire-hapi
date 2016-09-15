@@ -2,6 +2,7 @@ const models = require('../models');
 const Boom = require('boom');
 const Promise = require('bluebird');
 const _ = require('lodash');
+const xray = require('x-ray')();
 
 //private function
 /**
@@ -95,5 +96,51 @@ module.exports = function (hapiServer) {
       Promise.all(actions).then(() => reply(result));
     }
   });
+
+  /**
+   * Scrape the jisho page for answers
+   */
+  hapiServer.route({
+    method: 'GET',
+    path: '/search/jisho/{keyword}',
+    handler: (request, reply) => {
+      var keyword = encodeURIComponent(request.params.keyword);
+
+      if (!keyword) {
+        const error = Boom.badRequest('No keyword sent');
+        return reply(error);
+      }
+      var result = {};
+
+      var jishoKanjiSearch = new Promise((resolve, reject) => {
+        xray(`http://jisho.org/search/${keyword}%20%23kanji`, 'div.kanji.details', [{
+          character: '.character',
+          meaning: '.kanji-details__main-meanings',
+          kunyomi: ['.kanji-details__main-readings .kun_yomi dd a'],
+          onyomi: ['.kanji-details__main-readings .on_yomi dd a']
+        }])
+          .limit(5)
+          ((err, kanji) => {
+            if (err) {
+              reject(err);
+              return reply(Boom.badImplementation(err));
+            }
+
+            //clean up a bit
+            kanji = _.map(kanji, (row) => {
+              row.meaning = _.trim(row.meaning, ' \n');
+              row.onyomi = _.join(row.onyomi, ', ');
+              row.onyomi = _.join(row.onyomi, ', ');
+              return row;
+            });
+
+            result.kanji = kanji;
+            resolve();
+          });
+      });
+
+      Promise.all([jishoKanjiSearch]).then(() => reply(result));
+    }
+  })
 }
 ;
