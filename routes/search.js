@@ -47,9 +47,27 @@ var _doKanjiSearch = function (keyword, result) {
       }
     }
   })
-    .then(function (kanjis) {
-      result.kanji = kanjis;
-    });
+    .then(kanji => result.kanji = kanji);
+};
+
+/**
+ * Do a search on a word in the vocab on the vocab database
+ * @param keyword string
+ * @param result [any]
+ * @private
+ */
+var _doVocabSearch = function (keyword, result) {
+  return models.Vocab.findAll({
+    where: {
+      character: {
+        $like: `%${keyword}%`
+      }
+    },
+    order: [
+      ['level', 'ASC']
+    ]
+  })
+    .then(vocab => result.vocab = vocab);
 }
 
 module.exports = function (hapiServer) {
@@ -72,6 +90,7 @@ module.exports = function (hapiServer) {
       //get kanji radicals first
       actions.push(_doRadicalSearch(keyword, result));
       actions.push(_doKanjiSearch(keyword, result));
+      actions.push(_doVocabSearch(keyword, result));
 
       Promise.all(actions).then(() => reply(result));
     }
