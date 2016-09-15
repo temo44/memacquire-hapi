@@ -112,34 +112,41 @@ module.exports = function (hapiServer) {
       }
       var result = {};
 
-      var jishoKanjiSearch = new Promise((resolve, reject) => {
-        xray(`http://jisho.org/search/${keyword}%20%23kanji`, 'div.kanji.details', [{
-          character: '.character',
-          meaning: '.kanji-details__main-meanings',
-          kunyomi: ['.kanji-details__main-readings .kun_yomi dd a'],
-          onyomi: ['.kanji-details__main-readings .on_yomi dd a']
-        }])
+      var jishoKanjiRadicalSearch = new Promise((resolve, reject) => {
+        xray(`http://jisho.org/search/${keyword}%20%23kanji`, {
+          kanji: xray('div.kanji.details', [{
+            character: '.character',
+            meaning: '.kanji-details__main-meanings',
+            kunyomi: ['.kanji-details__main-readings .kun_yomi dd a'],
+            onyomi: ['.kanji-details__main-readings .on_yomi dd a']
+          }]),
+          radicals: xray('div.kanji.details', [{
+            kanji: '.character',
+            character: ['.radicals dd a']
+          }])
+        })
           .limit(5)
-          ((err, kanji) => {
+          ((err, payload) => {
             if (err) {
               reject(err);
               return reply(Boom.badImplementation(err));
             }
 
             //clean up a bit
-            kanji = _.map(kanji, (row) => {
+            payload.kanji = _.map(payload.kanji, (row) => {
               row.meaning = _.trim(row.meaning, ' \n');
               row.onyomi = _.join(row.onyomi, ', ');
-              row.onyomi = _.join(row.onyomi, ', ');
+              row.kunyomi = _.join(row.kunyomi, ', ');
               return row;
             });
 
-            result.kanji = kanji;
+            result.kanji = payload.kanji;
+            result.radicals = payload.radicals;
             resolve();
           });
       });
 
-      Promise.all([jishoKanjiSearch]).then(() => reply(result));
+      Promise.all([jishoKanjiRadicalSearch]).then(() => reply(result));
     }
   })
 }
