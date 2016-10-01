@@ -125,7 +125,6 @@ module.exports = function (hapiServer) {
             character: ['.radicals dd a']
           }])
         })
-          .limit(5)
           ((err, payload) => {
             if (err) {
               reject(err);
