@@ -145,7 +145,32 @@ module.exports = function (hapiServer) {
           });
       });
 
-      Promise.all([jishoKanjiRadicalSearch]).then(() => reply(result));
+      var jishoVocabSearch = new Promise((resolve, reject) => {
+        xray(`http://jisho.org/search/${keyword}`, '#primary .concept_light.clearfix', [{
+          kanji: '.concept_light-readings span.text',
+          kana: '.concept_light-readings span.furigana',
+          meaning: '.meanings-wrapper .meaning-meaning'
+        }])((err, payload) => {
+          if (err) {
+            reject(err);
+            return reply(Boom.badImplementation(err));
+          }
+
+          //clean up a bit
+          payload = _.map(payload, (data) => {
+            data.meaning = _.trim(data.meaning, ' \n');
+            data.kanji = _.trim(data.kanji, ' \n');
+            data.kana = _.trim(data.kana, ' \n');
+            return data;
+          });
+
+          result.vocab = payload;
+          resolve();
+        });
+
+      });
+
+      Promise.all([jishoKanjiRadicalSearch, jishoVocabSearch]).then(() => reply(result));
     }
   })
 }
