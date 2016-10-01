@@ -125,7 +125,6 @@ module.exports = function (hapiServer) {
             character: ['.radicals dd a']
           }])
         })
-          .limit(5)
           ((err, payload) => {
             if (err) {
               reject(err);
@@ -146,7 +145,38 @@ module.exports = function (hapiServer) {
           });
       });
 
-      Promise.all([jishoKanjiRadicalSearch]).then(() => reply(result));
+      var jishoVocabSearch = new Promise((resolve, reject) => {
+        xray(`http://jisho.org/search/${keyword}`, '#primary .concept_light.clearfix', [{
+          character: '.concept_light-readings span.text',
+          kana:['.concept_light-readings span.furigana span, .furigana rt'],
+          meaning: '.meanings-wrapper .meaning-meaning'
+        }])((err, payload) => {
+          if (err) {
+            reject(err);
+            return reply(Boom.badImplementation(err));
+          }
+
+          //clean up a bit
+          payload = _.map(payload, (data) => {
+            data.meaning = _.trim(data.meaning, ' \n');
+            data.character = _.trim(data.character, ' \n');
+            data.kana = _.join(_.map(data.kana, (char, index) => {
+              if(char === '') {
+                return data.character[index];
+              } else {
+                return char;
+              }
+            }), '');
+            return data;
+          });
+
+          result.vocab = payload;
+          resolve();
+        });
+
+      });
+
+      Promise.all([jishoKanjiRadicalSearch, jishoVocabSearch]).then(() => reply(result));
     }
   })
 }
