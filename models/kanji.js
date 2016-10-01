@@ -1,7 +1,7 @@
 'use strict';
 module.exports = function(sequelize, DataTypes) {
   var Kanji = sequelize.define('Kanji', {
-    id: DataTypes.INTEGER,
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     key: DataTypes.STRING,
     type: DataTypes.STRING,
     character: DataTypes.STRING,
