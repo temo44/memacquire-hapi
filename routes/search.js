@@ -147,8 +147,8 @@ module.exports = function (hapiServer) {
 
       var jishoVocabSearch = new Promise((resolve, reject) => {
         xray(`http://jisho.org/search/${keyword}`, '#primary .concept_light.clearfix', [{
-          kanji: '.concept_light-readings span.text',
-          kana: '.concept_light-readings span.furigana',
+          character: '.concept_light-readings span.text',
+          kana:['.concept_light-readings span.furigana span, .furigana rt'],
           meaning: '.meanings-wrapper .meaning-meaning'
         }])((err, payload) => {
           if (err) {
@@ -159,8 +159,14 @@ module.exports = function (hapiServer) {
           //clean up a bit
           payload = _.map(payload, (data) => {
             data.meaning = _.trim(data.meaning, ' \n');
-            data.kanji = _.trim(data.kanji, ' \n');
-            data.kana = _.trim(data.kana, ' \n');
+            data.character = _.trim(data.character, ' \n');
+            data.kana = _.join(_.map(data.kana, (char, index) => {
+              if(char === '') {
+                return data.character[index];
+              } else {
+                return char;
+              }
+            }), '');
             return data;
           });
 
