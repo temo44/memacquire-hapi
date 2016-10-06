@@ -148,7 +148,7 @@ module.exports = function (hapiServer) {
       var jishoVocabSearch = new Promise((resolve, reject) => {
         xray(`http://jisho.org/search/${keyword}`, '#primary .concept_light.clearfix', [{
           character: '.concept_light-readings span.text',
-          kana:['.concept_light-readings span.furigana span, .furigana rt'],
+          kana: ['.concept_light-readings span.furigana span, .furigana rt'],
           meaning: '.meanings-wrapper .meaning-meaning'
         }])((err, payload) => {
           if (err) {
@@ -161,7 +161,38 @@ module.exports = function (hapiServer) {
             data.meaning = _.trim(data.meaning, ' \n');
             data.character = _.trim(data.character, ' \n');
             data.kana = _.join(_.map(data.kana, (char, index) => {
-              if(char === '') {
+              if (char === '') {
+                return data.character[index];
+              } else {
+                return char;
+              }
+            }), '');
+            return data;
+          });
+
+          result.vocab = payload;
+          resolve();
+        });
+
+      });
+
+      var tagorinVocabSearch = new Promise((resolve, reject) => {
+        xray(`http://tangorin.com/general/${keyword}`, '.dictResults dl.dictEntries', [{
+          character: '.concept_light-readings span.text',
+          kana: ['dt span ruby '],
+          meaning: '.meanings-wrapper .meaning-meaning'
+        }])((err, payload) => {
+          if (err) {
+            reject(err);
+            return reply(Boom.badImplementation(err));
+          }
+
+          //clean up a bit
+          payload = _.map(payload, (data) => {
+            data.meaning = _.trim(data.meaning, ' \n');
+            data.character = _.trim(data.character, ' \n');
+            data.kana = _.join(_.map(data.kana, (char, index) => {
+              if (char === '') {
                 return data.character[index];
               } else {
                 return char;
@@ -178,6 +209,45 @@ module.exports = function (hapiServer) {
 
       Promise.all([jishoKanjiRadicalSearch, jishoVocabSearch]).then(() => reply(result));
     }
-  })
+  });
+
+  hapiServer.route({
+    method: 'GET',
+    path: '/search/tangorin/{keyword}',
+    handler: (request, reply) => {
+      var keyword = encodeURIComponent(request.params.keyword);
+
+      if (!keyword) {
+        const error = Boom.badRequest('No keyword sent');
+        return reply(error);
+      }
+      var result = {};
+      var error;
+
+      var tagorinVocabSearch = new Promise((resolve, reject) => {
+        xray(`http://tangorin.com/general/${keyword}`, '#dictResults dl#dictEntries .entry', [{
+          character: '.writing',
+          kana: 'dt span.kana ruby rb',
+          meaning: 'dd ul li ol li .eng'
+        }])((err, payload) => {
+          if (err) {
+            error = Boom.badImplementation(err);
+            return reject(err);
+          }
+
+          //clean up a bit
+          payload = _.map(payload, (data) => {
+            data.meaning = _.trim(data.meaning, ' \n');
+            data.character = _.trim(data.character, ' \n');
+            data.kana = _.trim(data.kana, ' \n');
+            return data;
+          });
+
+          result.vocab = payload;
+          resolve();
+        }); 
+      });
+      Promise.all([tagorinVocabSearch]).then(() => reply(error || result));
+    }
+  });
 }
-;
