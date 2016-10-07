@@ -20,7 +20,7 @@ var _doRadicalSearch = function (keyword, result) {
   return models.KanjiRadical.findAll({
     where: {
       kanji: {
-        $like: { $any: wordFilter }
+        $in: wordFilter
       }
     },
     order: [
