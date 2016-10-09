@@ -20,7 +20,7 @@ var _doRadicalSearch = function (keyword, result) {
   return models.KanjiRadical.findAll({
     where: {
       kanji: {
-        $like: { $any: wordFilter }
+        $in: wordFilter
       }
     },
     order: [
@@ -70,6 +70,36 @@ var _doVocabSearch = function (keyword, result) {
   })
     .then(vocab => result.vocab = vocab);
 }
+
+/**
+ * Search for vocab through tangorin
+ */
+var _doTangorinVocabSearch = function (keyword, result) {
+  return new Promise((resolve, reject) => {
+    xray(`http://tangorin.com/general/${keyword}`, '#dictResults dl#dictEntries .entry', [{
+      character: '.writing',
+      kana: 'dt span.kana ruby rb',
+      meaning: 'dd ul li ol li .eng'
+    }])((err, payload) => {
+      if (err) {
+        error = Boom.badImplementation(err);
+        return reject(err);
+      }
+
+      //clean up a bit
+      payload = _.map(payload, (data) => {
+        data.meaning = _.trim(data.meaning, ' \n');
+        data.character = _.trim(data.character, ' \n');
+        data.kana = _.trim(data.kana, ' \n');
+        return data;
+      });
+
+      result.vocab = payload;
+      resolve();
+    });
+  });
+}
+
 
 module.exports = function (hapiServer) {
   /**
@@ -125,7 +155,6 @@ module.exports = function (hapiServer) {
             character: ['.radicals dd a']
           }])
         })
-          .limit(5)
           ((err, payload) => {
             if (err) {
               reject(err);
@@ -146,8 +175,82 @@ module.exports = function (hapiServer) {
           });
       });
 
-      Promise.all([jishoKanjiRadicalSearch]).then(() => reply(result));
+      var jishoVocabSearch = new Promise((resolve, reject) => {
+        xray(`http://jisho.org/search/${keyword}`, '#primary .concept_light.clearfix', [{
+          character: '.concept_light-readings span.text',
+          kana: ['.concept_light-readings span.furigana span, .furigana rt'],
+          meaning: '.meanings-wrapper .meaning-meaning'
+        }])((err, payload) => {
+          if (err) {
+            reject(err);
+            return reply(Boom.badImplementation(err));
+          }
+
+          //clean up a bit
+          payload = _.map(payload, (data) => {
+            data.meaning = _.trim(data.meaning, ' \n');
+            data.character = _.trim(data.character, ' \n');
+            data.kana = _.join(_.map(data.kana, (char, index) => {
+              if (char === '') {
+                return data.character[index];
+              } else {
+                return char;
+              }
+            }), '');
+            return data;
+          });
+
+          result.vocab = payload;
+          resolve();
+        });
+
+      });
+
+      Promise.all([
+        jishoKanjiRadicalSearch, 
+        // jishoVocabSearch,
+        _doTangorinVocabSearch(keyword, result)
+        ]).then(() => reply(result));
     }
-  })
+  });
+
+  hapiServer.route({
+    method: 'GET',
+    path: '/search/tangorin/{keyword}',
+    handler: (request, reply) => {
+      var keyword = encodeURIComponent(request.params.keyword);
+
+      if (!keyword) {
+        const error = Boom.badRequest('No keyword sent');
+        return reply(error);
+      }
+      var result = {};
+      var error;
+
+      var tagorinVocabSearch = new Promise((resolve, reject) => {
+        xray(`http://tangorin.com/general/${keyword}`, '#dictResults dl#dictEntries .entry', [{
+          character: '.writing',
+          kana: 'dt span.kana ruby rb',
+          meaning: 'dd ul li ol li .eng'
+        }])((err, payload) => {
+          if (err) {
+            error = Boom.badImplementation(err);
+            return reject(err);
+          }
+
+          //clean up a bit
+          payload = _.map(payload, (data) => {
+            data.meaning = _.trim(data.meaning, ' \n');
+            data.character = _.trim(data.character, ' \n');
+            data.kana = _.trim(data.kana, ' \n');
+            return data;
+          });
+
+          result.vocab = payload;
+          resolve();
+        });
+      });
+      Promise.all([_doTangorinVocabSearch(keyword, result)]).then(() => reply(error || result));
+    }
+  });
 }
-;

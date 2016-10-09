@@ -5,11 +5,13 @@ const Sequelize = require('sequelize');
 const models = require('./models');
 const initRoutes = require('./routes');
 
+const env       = process.env.NODE_ENV || 'development';
+const config    = require(__dirname + '/config/config.json')[env];
 
 const server = new Hapi.Server();
 server.connection({
-  host: '192.168.1.7',
-  port: 5000,
+  host: config.apiUrl,
+  port: config.apiPort,
   routes: {
     cors: {
       origin: ['*']
