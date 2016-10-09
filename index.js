@@ -5,8 +5,7 @@ const Sequelize = require('sequelize');
 const models = require('./models');
 const initRoutes = require('./routes');
 
-const env       = process.env.NODE_ENV || 'development';
-const config    = require(__dirname + '/config/config.json')[env];
+const config = require('./config');
 
 const server = new Hapi.Server();
 server.connection({
