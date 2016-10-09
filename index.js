@@ -6,12 +6,13 @@ const models = require('./models');
 const initRoutes = require('./routes');
 
 const config = require('./config');
+var port = ~~process.env.PORT || 3000;
 var host = process.env.HOST || '0.0.0.0'
 
 const server = new Hapi.Server();
 server.connection({
   host: host,
-  port: config.apiPort,
+  port: port,
   routes: {
     cors: {
       origin: ['*']
