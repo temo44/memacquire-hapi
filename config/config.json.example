@@ -4,9 +4,7 @@
     "password": "postgres",
     "database": "memacquire",
     "host": "localhost",
-    "dialect": "postgres",
-    "apiUrl": "192.168.1.7",
-    "apiPort": "5000"
+    "dialect": "postgres
   },
   "test": {
       "username": "",
@@ -14,8 +12,6 @@
         "database": "",
         "port": 5432,
         "host": "",
-    "apiUrl": "192.168.1.7",
-    "apiPort": "5000",
         "dialect": "postgres",
         "dialectOptions": {
           "ssl": true
@@ -26,8 +22,6 @@
     "password": null,
     "database": "database_production",
     "host": "127.0.0.1",
-    "dialect": "mysql",
-    "apiUrl": "192.168.1.7",
-    "apiPort": "5000"
+    "dialect": "mysql"
   }
 }

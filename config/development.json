@@ -4,6 +4,4 @@
     "database": "postgres",
     "host": "localhost",
     "dialect": "postgres",
-    "apiUrl": "192.168.1.7",
-    "apiPort": "5000"
 }

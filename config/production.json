@@ -5,7 +5,5 @@
     "host": "data-test.db",
     "dialect": "sqlite",
     "storage": "data-test.db", 
-    "apiUrl": "127.0.0.1",
-    "apiPort": "80"
   }
   
