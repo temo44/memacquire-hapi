@@ -5,6 +5,7 @@
     "host": "data-test.db",
     "dialect": "sqlite",
     "storage": "data-test.db", 
-    "apiUrl": "immense-inlet-41320.herokuapp.com",
+    "apiUrl": "127.0.0.1",
     "apiPort": "80"
   }
+  
