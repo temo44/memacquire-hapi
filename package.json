@@ -5,7 +5,6 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --watch",
-    "test:old": "mocha \"**/__tests__/*.js\" --recursive --reporter spec",
     "sequelize": "sequelize"
   },
   "author": "",
@@ -20,11 +19,11 @@
     "sequelize-cli": "^2.4.0",
     "sqlite3": "^3.1.4",
     "x-ray": "^2.3.0"
-  }, 
+  },
   "devDependencies": {
     "jest": "^16.0.2"
   },
   "jest": {
-    "verbose": true 
+    "verbose": true
   }
 }

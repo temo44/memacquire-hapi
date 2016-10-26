@@ -11,56 +11,76 @@
 //     }
 // });
 
+jest.mock('../collect/service');
+
 const Hapi = require('hapi');
 
 
 describe('collect -- handler', () => {
     let server;
+    let collectService;
 
     describe('GET', () => {
-        let vocabSearch;
-        let request;
-        let reply;
-        let handlers;
-
         beforeEach(() => {
+            jest.resetModules();
             server = new Hapi.Server();
             server.connection({ port: 4444 });
             //init routes
             require('../collect/route')(server);
+            collectService = require('../collect/service');
         });
 
-        afterEach(() => {
-            server.stop();
-        });
+        // afterEach(() => {
+        //     server.close();
+        // });
 
-        it('calls without failing', () => {
-            server.inject('/collect', (res) => {
+        it('calls without failing', (done) => {
+            server.inject('/collect/1', (res) => {
                 expect(res.result).toEqual('success!');
+                done();
             });
         });
 
-        // it('calls vocab search', () => {
-        //     handlers = require('../collect/handler');
+        it('calls vocab search', (done) => {
+            server.inject('/collect/1', (res) => {
+                expect(collectService.vocab)
+                    .toHaveBeenCalledTimes(1);
+                done();
+            });
+        });
 
-        //     handlers.getHandler(request, reply);
+        it('calls the vocab search with 始める', (done) => {
+            const keyword = '始める';
+            server.inject(`/collect/${keyword}`, (res) => {
+                expect(collectService.vocab).toHaveBeenCalledTimes(1);
+                expect(collectService.vocab).toBeCalledWith(keyword);
+                expect(res.statusCode).toBe(200);
+                done();
+            });
+        });
 
-        //     expect(require('../../services/vocab-collect-service').vocab).toBeCalled();
-        // });
+        it('calls the kanji search with 友達', (done) => {
+            const keyword = '友達';
+            server.inject(`/collect/${keyword}`, (res) => {
+                expect(collectService.vocab).toHaveBeenCalledTimes(1);
+                expect(collectService.kanji).toHaveBeenCalledTimes(1);
+                expect(res.statusCode).toBe(200);
+                done();
+            });
+        });
 
-        // it('calls the vocab search with 始める', () => {
-        //     const Promise = require('bluebird');
+        it('calls all methods to search with 友達', (done) => {
+            const keyword = '友達';
+            server.inject(`/collect/${keyword}`, (res) => {
+                expect(collectService.vocab).toHaveBeenCalledTimes(1);
+                expect(collectService.kanji).toHaveBeenCalledTimes(1);
+                expect(collectService.radical).toHaveBeenCalledTimes(1);
+                expect(res.statusCode).toBe(200);
+                done();
+            });
+        });
 
-        //     vocabSearch = jest.fn();
-        //     jest.mock('../../services/vocab-collect-service.js', () => { return { vocab: vocabSearch } });
-        //     handlers = require('../collect/handler');
-
-        //     handlers.getHandler(request, reply);
-
-
-        //     expect(vocabSearch).toHaveBeenCalledTimes(1);
-        //     expect(vocabSearch).toBeCalledWith('始める');
-        // });
+        
 
 
     });
