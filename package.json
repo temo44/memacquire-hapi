@@ -4,7 +4,7 @@
   "description": "test hapi",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha \"**/__tests__/*.js\" --recursive --reporter spec",
     "sequelize": "sequelize"
   },
   "author": "",
