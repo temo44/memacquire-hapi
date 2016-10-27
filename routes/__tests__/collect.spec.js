@@ -1,20 +1,15 @@
-// jest.mock('../../services/vocab-collect-service', () => {
-//     return {
-//         // vocab: (keyword) => {
-//         //     let p = new Promise((resolve, reject) => {
-//         //         resolve();
-//         //     });
-//         //     p.resolve();
-//         //     return p;
-//         // }
-//         vocab: (keyword) => console.log('bladibla')
-//     }
-// });
-
-jest.mock('../collect/service');
-
+const Promise = require('bluebird');
 const Hapi = require('hapi');
 
+const mockFn = jest.fn();
+jest.mock('../collect/service', () => {
+    return {
+        search: (keyword) => new Promise((resolve, reject) => {
+            mockFn(keyword);
+            resolve();
+        })
+    }
+});
 
 describe('collect -- handler', () => {
     let server;
@@ -23,17 +18,13 @@ describe('collect -- handler', () => {
     describe('GET', () => {
         beforeEach(() => {
             jest.resetModules();
+            mockFn.mockClear();
             server = new Hapi.Server();
             server.connection({ port: 4444 });
             //init routes
             require('../collect/route')(server);
-            collectService = require('../collect/service');
         });
-
-        // afterEach(() => {
-        //     server.close();
-        // });
-
+        
         it('calls without failing', (done) => {
             server.inject('/collect/1', (res) => {
                 expect(res.result).toEqual('success!');
@@ -41,48 +32,24 @@ describe('collect -- handler', () => {
             });
         });
 
-        it('calls vocab search', (done) => {
-            server.inject('/collect/1', (res) => {
-                expect(collectService.vocab)
-                    .toHaveBeenCalledTimes(1);
-                done();
-            });
-        });
-
         it('calls the vocab search with 始める', (done) => {
+            jest.mock('../collect/service', () => {
+                return {
+                    search: (keyword) => {
+                        mockFn(keyword);
+                        Promise.resolve()
+                    }
+                }
+            });
+
             const keyword = '始める';
             server.inject(`/collect/${keyword}`, (res) => {
-                expect(collectService.vocab).toHaveBeenCalledTimes(1);
-                expect(collectService.vocab).toBeCalledWith(keyword);
+                expect(mockFn).toHaveBeenCalledTimes(1);
+                expect(mockFn).toBeCalledWith(keyword);
                 expect(res.statusCode).toBe(200);
                 done();
             });
         });
-
-        it('calls the kanji search with 友達', (done) => {
-            const keyword = '友達';
-            server.inject(`/collect/${keyword}`, (res) => {
-                expect(collectService.vocab).toHaveBeenCalledTimes(1);
-                expect(collectService.kanji).toHaveBeenCalledTimes(1);
-                expect(res.statusCode).toBe(200);
-                done();
-            });
-        });
-
-        it('calls all methods to search with 友達', (done) => {
-            const keyword = '友達';
-            server.inject(`/collect/${keyword}`, (res) => {
-                expect(collectService.vocab).toHaveBeenCalledTimes(1);
-                expect(collectService.kanji).toHaveBeenCalledTimes(1);
-                expect(collectService.radical).toHaveBeenCalledTimes(1);
-                expect(res.statusCode).toBe(200);
-                done();
-            });
-        });
-
-        
-
-
     });
     // it('call GET handler without failing', () => {
     //     const expectedResult = {
