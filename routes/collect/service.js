@@ -1,19 +1,14 @@
 const Promise = require('bluebird');
 
-module.exports = {
-    search: (keyword) => new Promise((resolve, reject) => {
-        resolve();
-    }),
+const vocab = require('./model').vocab; 
 
-    vocab: (keyword) => new Promise((resolve, reject) => {
-          resolve();
-    }),
-
-    kanji: (keyword) => new Promise((resolve, reject) => {
-        resolve();
-    }),
-
-    radical: (keyword) => new Promise((resolve, reject) => {
-        resolve();
+const collect = {
+    search: (keyword) => new Promise((resolve, reject) => { 
+        vocab.get(keyword).then(() => {
+            resolve();
+        }); 
     })
+
 }
+
+module.exports = collect;
