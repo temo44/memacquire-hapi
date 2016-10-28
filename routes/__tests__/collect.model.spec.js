@@ -1,12 +1,13 @@
 
-var vocab = require('../collect/model').vocab;
+let vocab = require('../collect/model').vocab;
+let kanji = require('../collect/model').kanji;
 
-describe('collect - model', () => {
+describe('collect - model - vocab', () => {
 
     it('is callable', (done) => {
         vocab.get('hallo').then(() => {
-            done(); 
-        }); 
+            done();
+        });
     });
 
     it('retrieves vocab data from external source', (done) => {
@@ -14,17 +15,17 @@ describe('collect - model', () => {
             expect(result).toEqual({
                 character: '自転車',
                 meaning: 'bicycle',
-                kana: 'じてんしゃ' 
+                kana: 'じてんしゃ'
             });
-            done(); 
-        }); 
+            done();
+        });
     });
 
     it('returns undefined when nothing is found', (done) => {
         vocab.get('dklfjsl').then(result => {
             expect(result).toBeUndefined();
             done();
-        }); 
+        });
     });
 
     it('can search for an english word', (done) => {
@@ -35,8 +36,25 @@ describe('collect - model', () => {
                 kana: 'さかな'
             });
 
-            done(); 
+            done();
         });
+    });
+
+});
+
+describe('collect - model - kanji', () => {
+
+    it('should call kanji just fine', (done) => {
+
+
+    });
+
+    it('searches all kanji of wanikani in the database', () => {
+
+    });
+
+    it('searches online for kanji that aren\'t found by wanikani', () => {
+
     });
 
 });
