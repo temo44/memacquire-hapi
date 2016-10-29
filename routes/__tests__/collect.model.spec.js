@@ -44,17 +44,29 @@ describe('collect - model - vocab', () => {
 
 describe('collect - model - kanji', () => {
 
-    it('should call kanji just fine', (done) => {
-
-
+    it('calls kanji just fine', (done) => {
+        kanji.get('出口').then((result) => {
+            done();
+        });
     });
 
-    it('searches all kanji of wanikani in the database', () => {
-
+    it('searches all kanji of wanikani on the web', (done) => {
+        kanji.get('出口').then((result) => {
+            expect(result).toEqual([{
+                    "character": "出",
+                    "kunyomi": ["で.る", "-で", "だ.す", "-だ.す", "い.でる", "い.だす"],
+                    "meaning": ["exit", "leave", "go out", "come out", "put out", "protrude"],
+                    "onyomi": ["シュツ", "スイ"],
+                    "parts": ["｜", "山"]
+                }, {
+                    "character": "口",
+                    "kunyomi": ["くち"],
+                    "meaning": ["mouth"],
+                    "onyomi": ["コウ", "ク"],
+                    "parts": ["口", "囗"]
+                }]
+            );
+            done();
+        });
     });
-
-    it('searches online for kanji that aren\'t found by wanikani', () => {
-
-    });
-
 });
