@@ -69,4 +69,11 @@ describe('collect - model - kanji', () => {
             done();
         });
     });
+
+    it('gives an undefined when nothing found on kanji', (done) => {
+       kanji.get('lskdjflsdkfj').then((result) => {
+           expect(result).toEqual([]);
+           done();
+       }) 
+    });
 });
