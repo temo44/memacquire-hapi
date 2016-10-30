@@ -15,7 +15,7 @@ describe('collect - model - vocab', () => {
         vocab.get('自転車').then(result => {
             expect(result).toEqual({
                 character: '自転車',
-                meaning: 'bicycle',
+                meaning: ['bicycle'],
                 kana: 'じてんしゃ'
             });
             done();
@@ -33,7 +33,7 @@ describe('collect - model - vocab', () => {
         vocab.get('fish').then(result => {
             expect(result).toEqual({
                 character: '魚',
-                meaning: 'fish',
+                meaning: ['fish'],
                 kana: 'さかな'
             });
 
@@ -92,7 +92,7 @@ describe('collect - model - radical', () => {
                 kanji: '出',
                 character: '山',
                 characterImageUrl: null,
-                meaning: 'Mountain'
+                meaning: 'mountain'
             }];
 
             expect(result).toEqual(expectedResult);
@@ -106,7 +106,7 @@ describe('collect - model - radical', () => {
                 kanji: '日',
                 character: '日',
                 characterImageUrl: null,
-                meaning: 'Sun'
+                meaning: 'sun'
             }];
 
             expect(result).toEqual(expectedResult);
@@ -120,17 +120,17 @@ describe('collect - model - radical', () => {
                 {
                     "character": "食", "characterImageUrl": null,
                     "kanji": "館",
-                    "meaning": "Eat"
+                    "meaning": "eat"
                 }, {
                     "character": null,
                     "characterImageUrl": "https://s3.amazonaws.com/s3.wanikani.com/images/radicals/b28490c3120f080ee2a5e3e1700d581d671d5bd7.png",
                     "kanji": "館",
-                    "meaning": "Bear"
+                    "meaning": "bear"
                 }, {
                     "character": "宀",
                     "characterImageUrl": null,
                     "kanji": "館",
-                    "meaning": "Helmet"
+                    "meaning": "helmet"
                 }];
 
             expect(result).toEqual(expectedResult);
@@ -145,6 +145,6 @@ describe('collect - model - radical', () => {
             expect(result).toEqual(expectedResult); 
             done();
         }); 
-    })
+    });
 
 });

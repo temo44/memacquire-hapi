@@ -5,6 +5,11 @@ const models = require('../../models');
 
 
 let vocab = {
+    /**
+     * Get a vocab word detail based on keyword. Returns only one object
+     * @param keyword {string} a string
+     * @return {Promise} vocab details
+     */
     get: (keyword) => {
         return new Promise((resolve, reject) => {
             const url = encodeURIComponent(keyword);
@@ -20,6 +25,8 @@ let vocab = {
                 //clean up a bit
                 payload = _.map(payload, (data) => {
                     data.meaning = _.trim(data.meaning, ' \n');
+                    data.meaning = _.split(data.meaning, ';');
+                    data.meaning = _.map(data.meaning, (meaning) => _.trim(meaning));
                     data.character = _.trim(data.character, ' \n');
                     data.kana = _.trim(data.kana, ' \n');
                     return data;
@@ -40,6 +47,10 @@ let vocab = {
 }
 
 const kanji = {
+    /**
+     * Get kanji details on either a string or array of kanji characters
+     * @param {keyword} can be either a string or array of strings
+     */
     get: (keyword) => {
         return new Promise((resolve, reject) => {
             const url = encodeURIComponent(keyword);
@@ -71,6 +82,10 @@ const kanji = {
 }
 
 const radical = {
+    /**
+     * Collect radicals by their respective characters
+     * @param {kanjiCharacters} List of kanji to search for radicals
+     */
     getByKanji: (kanjiCharacters) => {
         return new Promise((resolve, reject) => { 
             if(!kanjiCharacters) {
@@ -96,7 +111,7 @@ const radical = {
                         kanji: rad.kanji,
                         character: rad.radical,
                         characterImageUrl: rad.radicalImage,
-                        meaning: rad.radicalMeaning 
+                        meaning: _.toLower(rad.radicalMeaning)
                     }
                 })
 
