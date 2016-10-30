@@ -39,8 +39,8 @@ module.exports = {
           kanji: vals[kanji],
           radical: vals[radical],
           radicalMeaning: vals[radicalMeaning],
-          createdAt: new Date().toDateString(),
-          updatedAt: new Date().toDateString()
+          createdAt: new Date(),
+          updatedAt: new Date()
         };
       });
       

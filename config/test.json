@@ -1,0 +1,9 @@
+{
+    "username": "root",
+    "password": null,
+    "database": "database_development",
+    "host": "data-test.db",
+    "dialect": "sqlite",
+    "storage": "data-test.db",
+    "logging": false
+}

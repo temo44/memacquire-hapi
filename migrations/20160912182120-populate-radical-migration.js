@@ -42,8 +42,8 @@ module.exports = {
           meaning: val[meaning],
           image: val[image],
           level: val[level],
-          createdAt: new Date().toDateString(),
-          updatedAt: new Date().toDateString()
+          createdAt: new Date(),
+          updatedAt: new Date()
         };
       });
       

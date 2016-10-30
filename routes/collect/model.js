@@ -1,6 +1,7 @@
 const Promise = require('bluebird');
 const xray = require('x-ray')();
 const _ = require('lodash');
+const models = require('../../models');
 
 
 let vocab = {
@@ -69,5 +70,42 @@ const kanji = {
     }
 }
 
+const radical = {
+    getByKanji: (kanjiCharacters) => {
+        return new Promise((resolve, reject) => { 
+            if(!kanjiCharacters) {
+                return resolve([]);
+            }
+
+            if(typeof kanjiCharacters === 'string') {
+                kanjiCharacters = _.split(kanjiCharacters, '');
+            }
+
+            models.KanjiRadical.findAll({
+                where: {
+                    kanji: {
+                        $in: kanjiCharacters
+                    }
+                },
+                order: [
+                    ['kanji', 'ASC']
+                ]
+            }).then(kanjiRadicals => {
+                kanjiRadicals = _.map(kanjiRadicals, (rad) => {
+                    return {
+                        kanji: rad.kanji,
+                        character: rad.radical,
+                        characterImageUrl: rad.radicalImage,
+                        meaning: rad.radicalMeaning 
+                    }
+                })
+
+                resolve(kanjiRadicals);
+            });
+        });
+    }
+}
+
 module.exports.vocab = vocab;
 module.exports.kanji = kanji;
+module.exports.radical = radical;
