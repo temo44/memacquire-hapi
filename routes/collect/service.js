@@ -1,3 +1,5 @@
+"use strict";
+
 const Promise = require('bluebird');
 
 const vocab = require('./model').vocab;

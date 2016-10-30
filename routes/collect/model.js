@@ -1,3 +1,5 @@
+"use strict";
+
 const Promise = require('bluebird');
 const xray = require('x-ray')();
 const _ = require('lodash');

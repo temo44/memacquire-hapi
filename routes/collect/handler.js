@@ -1,3 +1,5 @@
+"use strict";
+
 const collect = require('./service');
 const Promise = require('bluebird');
 
