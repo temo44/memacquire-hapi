@@ -5,6 +5,11 @@ const kanji = require('./model').kanji;
 const radical = require('./model').radical;
 
 const collect = {
+    /**
+     * Search for all possible (vocab, kanji, radical) data for a word
+     * @param keyword {string} 
+     * @returns {Promise} returns a promise 
+     */
     search: (keyword) => new Promise((resolve, reject) => {
         let result = {};
 

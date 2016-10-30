@@ -2,12 +2,24 @@ const fs = require('fs');
 const path = require('path');
 
 module.exports = function (hapiServer) {
-  fs
-    .readdirSync(__dirname)
-    .forEach(function (file) {
-      if (file === 'index.js') return;
+  let traverseDirectory = (dirName) => {
+    fs.readdirSync(dirName)
+      .forEach((file) => loadRoute(dirName, file));
+  }
 
+  let loadRoute = (dirName, file) => {
+    let filePath = path.join(dirName, file);
+    const fileStats = fs.lstatSync(filePath);
+
+    if(fileStats.isDirectory()) {
+      traverseDirectory(filePath);
+    }
+
+    if (fileStats.isFile() && filePath.endsWith('route.js')) { 
       console.log(`going to import route file ${file}`);
-      require(path.join(__dirname, file))(hapiServer);
-    });
+      require(filePath)(hapiServer);
+    }
+  };
+
+  traverseDirectory(__dirname);
 }
